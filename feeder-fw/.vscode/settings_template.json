@@ -12,7 +12,14 @@
         "interface/ftdi/esp32_devkitj_v1.cfg",
         "target/esp32.cfg"
     ],
-    "idf.portWin": "COM5",
     "idf.pythonBinPathWin": "C:\\Path\\To\\.espressif\\python_env\\idf5.2_py3.11_env\\Scripts\\python.exe",
-    "idf.toolsPathWin": "C:\\Path\\To\\.espressif"
+    "idf.toolsPathWin": "C:\\Path\\To\\.espressif",
+    "idf.flashType": "UART",
+    "idf.portWin": "COM5",
+    "files.associations": {
+        "app_nvs.h": "c",
+        "stdio.h": "c",
+        "freertos.h": "c",
+        "esp_system.h": "c"
+    }
 }
