@@ -29,6 +29,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "app_nvs.h"
+#include "app_wifi.h"
 
 static const char *TAG = "main"; ///< Tag to be used when logging
 
@@ -53,17 +54,45 @@ void app_main(void)
     else
     {
         err = app_nvs__get_data();
-        if (err != ESP_OK)
+        // if (err != ESP_OK)
+        if (0)
         {
             app_error_handling__restart();
         }
         else
         {
-            for (;;)
+            err = app_wifi__init();
+            if (err != ESP_OK)
             {
-                ESP_LOGI(TAG, "I'm alive! Dummy counter = %d", (int)dummy_counter);
-                dummy_counter++;
-                vTaskDelay(10000 / portTICK_PERIOD_MS);
+                app_error_handling__restart();
+            }
+            else
+            {
+                err = app_wifi__start();
+                if (err != ESP_OK)
+                {
+                    app_error_handling__restart();
+                }
+                else
+                {
+                    for (;;)
+                    {
+                        ESP_LOGI(TAG, "I'm alive! Dummy counter = %d", (int)dummy_counter);
+                        dummy_counter++;
+                        vTaskDelay(10000 / portTICK_PERIOD_MS);
+                        err = app_wifi__stop();
+                        if (err != ESP_OK)
+                        {
+                            app_error_handling__restart();
+                        }
+                        vTaskDelay(10000 / portTICK_PERIOD_MS);
+                        err = app_wifi__start();
+                        if (err != ESP_OK)
+                        {
+                            app_error_handling__restart();
+                        }
+                    }
+                }
             }
         }
     }
