@@ -59,6 +59,7 @@ esp_err_t app_nvs__init(void)
  *
  * @return esp_err_t
  * @retval ESP_OK if data is successfully read from NVS.
+ * @retval ESP_ERR_NOT_FOUND if some data is not found in NVS.
  * @retval ESP_FAIL otherwise.
  */
 esp_err_t app_nvs__get_data(void)
@@ -66,12 +67,16 @@ esp_err_t app_nvs__get_data(void)
     ESP_LOGI(TAG, "Getting NVS data");
     uint8_t authorized_mac[6] = {0};
     esp_err_t err = app_nvs__get_authorized_mac(authorized_mac);
-    if (err != ESP_OK)
+    if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
     {
         ESP_LOGE(TAG, "Error %d getting authorized MAC from NVS: %s", err, esp_err_to_name(err));
         return ESP_FAIL;
     }
-    else
+    else if (err == ESP_ERR_NVS_NOT_FOUND)
+    {
+        ESP_LOGW(TAG, "Could not find authorized MAC in NVS");
+        return ESP_ERR_NOT_FOUND;
+    }
     {
         ESP_LOGI(TAG, "Success getting MAC address from NVS: 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x",
                  authorized_mac[0], authorized_mac[1], authorized_mac[2], authorized_mac[3], authorized_mac[4], authorized_mac[5]);
@@ -122,6 +127,7 @@ esp_err_t app_nvs__set_authorized_mac(uint8_t authorized_mac[6])
  * @param authorized_mac 6 bytes array where the authorized MAC will be stored.
  * @return esp_err_t
  * @retval ESP_OK if authorized MAC is successfully read from NVS.
+ * @retval ESP_ERR_NVS_NOT_FOUND if authorized MAC is not found in NVS.
  * @retval ESP_FAIL otherwise.
  */
 esp_err_t app_nvs__get_authorized_mac(uint8_t authorized_mac[6])
@@ -139,10 +145,15 @@ esp_err_t app_nvs__get_authorized_mac(uint8_t authorized_mac[6])
     {
         ESP_LOGD(TAG, "Success opening NVS!");
         err = nvs_get_blob(nvs_handle, AUTHORIZED_MAC_ENTRY_KEY, authorized_mac, (size_t *)&authorized_mac_len);
-        if (err != ESP_OK)
+        if (err != ESP_OK && err != ESP_ERR_NVS_NOT_FOUND)
         {
             ESP_LOGE(TAG, "Error %d getting blob from NVS: %s", err, esp_err_to_name(err));
             return ESP_FAIL;
+        }
+        else if (err == ESP_ERR_NVS_NOT_FOUND)
+        {
+            ESP_LOGW(TAG, "No MAC address written to NVS yet");
+            return ESP_ERR_NVS_NOT_FOUND;
         }
         else
         {
