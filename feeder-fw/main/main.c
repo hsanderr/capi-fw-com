@@ -55,8 +55,7 @@ void app_main(void)
     else
     {
         err = app_nvs__get_data();
-        // if (err != ESP_OK)
-        if (0)
+        if (err != ESP_OK && err != ESP_ERR_NOT_FOUND)
         {
             app_error_handling__restart();
         }
