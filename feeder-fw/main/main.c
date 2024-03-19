@@ -28,6 +28,7 @@
 #include "esp_system.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
 #include "app_nvs.h"
 #include "app_wifi.h"
 
@@ -79,7 +80,7 @@ void app_main(void)
                     {
                         ESP_LOGI(TAG, "I'm alive! Dummy counter = %d", (int)dummy_counter);
                         dummy_counter++;
-                        vTaskDelay(10000 / portTICK_PERIOD_MS);
+                        vTaskDelay(60000 / portTICK_PERIOD_MS);
                         err = app_wifi__stop();
                         if (err != ESP_OK)
                         {
