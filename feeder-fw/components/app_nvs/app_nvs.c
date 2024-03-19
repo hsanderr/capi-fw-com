@@ -22,11 +22,12 @@
     limitations under the License.
  */
 
-#include "app_nvs.h"
 #define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
 #include "nvs_flash.h"
+
+#include "app_nvs.h"
 
 #define MAIN_NVS_NAMESPACE "nvs_main"       ///< Main NVS namespace
 #define AUTHORIZED_MAC_ENTRY_KEY "auth_mac" ///< Authorized MAC entry key

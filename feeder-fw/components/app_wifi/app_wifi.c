@@ -22,7 +22,9 @@
     limitations under the License.
  */
 
-#include "app_wifi.h"
+#include <string.h>
+#include <stdio.h>
+
 #define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
@@ -32,8 +34,9 @@
 #include "esp_mac.h"
 #include "lwip/err.h"
 #include "lwip/sys.h"
-#include <string.h>
-#include <stdio.h>
+
+#include "app_wifi.h"
+#include "app_web_server.h"
 
 #define ESP_WIFI_AP_SSID "PetDog ComeInt"
 #define ESP_WIFI_AP_CHANNEL 1
@@ -187,11 +190,13 @@ static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t e
         wifi_event_ap_staconnected_t *event = (wifi_event_ap_staconnected_t *)event_data;
         ESP_LOGI(TAG, "station " MACSTR " joined, AID: %d",
                  MAC2STR(event->mac), event->aid);
+        app_web_server__start();
     }
     else if (event_id == WIFI_EVENT_AP_STADISCONNECTED)
     {
         wifi_event_ap_stadisconnected_t *event = (wifi_event_ap_stadisconnected_t *)event_data;
         ESP_LOGI(TAG, "station " MACSTR " left, AID: %d",
                  MAC2STR(event->mac), event->aid);
+        app_web_server__stop();
     }
 }
