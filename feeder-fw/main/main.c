@@ -31,10 +31,11 @@
 
 #include "app_nvs.h"
 #include "app_wifi.h"
+#include "app_gpio.h"
 
 static const char *TAG = "main"; ///< Tag to be used when logging
 
-void app_error_handling__restart(void)
+static void app_error_handling__restart(void)
 {
     uint8_t reboot_delay_sec = 3;
     ESP_LOGE(TAG, "Fatal error found, rebooting in %d seconds..", (int)reboot_delay_sec);
@@ -52,48 +53,33 @@ void app_main(void)
     {
         app_error_handling__restart();
     }
-    else
+    err = app_nvs__get_data();
+    if (err != ESP_OK && err != ESP_ERR_NOT_FOUND)
     {
-        err = app_nvs__get_data();
-        if (err != ESP_OK && err != ESP_ERR_NOT_FOUND)
-        {
-            app_error_handling__restart();
-        }
-        else
-        {
-            err = app_wifi__init();
-            if (err != ESP_OK)
-            {
-                app_error_handling__restart();
-            }
-            else
-            {
-                err = app_wifi__start();
-                if (err != ESP_OK)
-                {
-                    app_error_handling__restart();
-                }
-                else
-                {
-                    for (;;)
-                    {
-                        ESP_LOGI(TAG, "I'm alive! Dummy counter = %d", (int)dummy_counter);
-                        dummy_counter++;
-                        vTaskDelay(60000 / portTICK_PERIOD_MS);
-                        err = app_wifi__stop();
-                        if (err != ESP_OK)
-                        {
-                            app_error_handling__restart();
-                        }
-                        vTaskDelay(10000 / portTICK_PERIOD_MS);
-                        err = app_wifi__start();
-                        if (err != ESP_OK)
-                        {
-                            app_error_handling__restart();
-                        }
-                    }
-                }
-            }
-        }
+        app_error_handling__restart();
+    }
+    err = app_wifi__init();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    err = app_wifi__start();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    err = app_gpio__init();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    app_gpio__blink_green_led_slow(1);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    app_gpio__blink_green_led_fast(2);
+    for (;;)
+    {
+        ESP_LOGI(TAG, "I'm alive! Dummy counter = %d", (int)dummy_counter);
+        dummy_counter++;
+        vTaskDelay(60000 / portTICK_PERIOD_MS);
     }
 }
