@@ -73,9 +73,13 @@ void app_main(void)
     {
         app_error_handling__restart();
     }
-    app_gpio__blink_green_led_slow(1);
+    app_gpio__blink_blue_led_slow(1);
     vTaskDelay(2000 / portTICK_PERIOD_MS);
-    app_gpio__blink_green_led_fast(2);
+    app_gpio__blink_blue_led_fast(2);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    app_gpio__blink_red_led_slow(1);
+    vTaskDelay(2000 / portTICK_PERIOD_MS);
+    app_gpio__blink_red_led_fast(2);
     for (;;)
     {
         ESP_LOGI(TAG, "I'm alive! Dummy counter = %d", (int)dummy_counter);

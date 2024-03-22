@@ -14,7 +14,7 @@
 #include "esp_err.h"
 
 esp_err_t app_gpio__init(void);
-esp_err_t app_gpio__blink_green_led_slow(uint8_t times);
-esp_err_t app_gpio__blink_green_led_fast(uint8_t times);
+esp_err_t app_gpio__blink_blue_led_slow(uint8_t times);
+esp_err_t app_gpio__blink_blue_led_fast(uint8_t times);
 esp_err_t app_gpio__blink_red_led_slow(uint8_t times);
 esp_err_t app_gpio__blink_red_led_fast(uint8_t times);
