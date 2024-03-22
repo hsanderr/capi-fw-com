@@ -25,6 +25,7 @@
 #define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
+#include "esp_intr_alloc.h"
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -33,11 +34,11 @@
 #include "app_gpio.h"
 #include "app_wifi.h"
 
-#define GPIO_GREEN_LED (2)                                                                        ///< Green LED GPIO
-#define GPIO_RED_LED (3)                                                                          ///< Red LED GPIO
-#define GPIO_BUTTON (4)                                                                           ///< Button GPIO
-#define GPIO_OUTPUT_PIN_SEL ((((uint64_t)1) << GPIO_GREEN_LED) | (((uint64_t)1) << GPIO_RED_LED)) ///< LEDs pin mask
-#define GPIO_INPUT_PIN_SEL (((uint64_t)1) << GPIO_BUTTON)                                         ///< Button pin mask
+#define GPIO_BLUE_LED (2)                                                                        ///< Blue LED GPIO
+#define GPIO_RED_LED (4)                                                                         ///< Red LED GPIO
+#define GPIO_BUTTON (16)                                                                         ///< Button GPIO
+#define GPIO_OUTPUT_PIN_SEL ((((uint64_t)1) << GPIO_BLUE_LED) | (((uint64_t)1) << GPIO_RED_LED)) ///< LEDs pin mask
+#define GPIO_INPUT_PIN_SEL (((uint64_t)1) << GPIO_BUTTON)                                        ///< Button pin mask
 #define BUTTON_HOLD_TIME_SECS (3)
 
 static const char *TAG = "app_gpio";                           ///< Tag to be used when logging
@@ -69,7 +70,7 @@ esp_err_t app_gpio__init(void)
         .mode = GPIO_MODE_INPUT,
         .pull_up_en = GPIO_PULLUP_ENABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE};
+        .intr_type = GPIO_INTR_NEGEDGE};
     esp_err_t err = gpio_config(&config);
     if (err != ESP_OK)
     {
@@ -78,11 +79,16 @@ esp_err_t app_gpio__init(void)
     }
     ESP_LOGI(TAG, "Success configuring input GPIOs!");
 
+    // gpio_install_isr_service(ESP_INTR_FLAG_LEVEL1 | ESP_INTR_FLAG_EDGE | ESP_INTR_FLAG_SHARED | ESP_INTR_FLAG_IRAM);
+    gpio_install_isr_service(0);
+
+    gpio_isr_handler_add(GPIO_BUTTON, app_gpio__isr_handler, NULL);
+
     config.pin_bit_mask = GPIO_OUTPUT_PIN_SEL;
     config.mode = GPIO_MODE_OUTPUT;
     config.pull_up_en = GPIO_PULLUP_DISABLE;
     config.pull_down_en = GPIO_PULLDOWN_DISABLE;
-    config.intr_type = GPIO_INTR_POSEDGE;
+    config.intr_type = GPIO_INTR_DISABLE;
     err = gpio_config(&config);
     if (err != ESP_OK)
     {
@@ -99,13 +105,13 @@ esp_err_t app_gpio__init(void)
     }
     ESP_LOGI(TAG, "Set red LED GPIO to low");
 
-    gpio_set_level(GPIO_GREEN_LED, 0);
+    gpio_set_level(GPIO_BLUE_LED, 0);
     if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "Error %d setting green LED GPIO to low: %s", err, esp_err_to_name(err));
+        ESP_LOGE(TAG, "Error %d setting blue LED GPIO to low: %s", err, esp_err_to_name(err));
         return ESP_FAIL;
     }
-    ESP_LOGI(TAG, "Set green LED GPIO to low");
+    ESP_LOGI(TAG, "Set blue LED GPIO to low");
 
     if (xTaskCreate(app_gpio__check_button_task,
                     "app_gpio__check_button_task", 2048, NULL, 10,
@@ -120,28 +126,28 @@ esp_err_t app_gpio__init(void)
 }
 
 /**
- * @brief Slowly blink green LED for the specified number of times.
+ * @brief Slowly blink blue LED for the specified number of times.
  *
  * @param times Number of times to blink the LED.
  * @return esp_err_t
  * @retval ESP_OK if LED is successfully blinked.
  * @retval ESP_FAIL otherwise.
  */
-esp_err_t app_gpio__blink_green_led_slow(uint8_t times)
+esp_err_t app_gpio__blink_blue_led_slow(uint8_t times)
 {
     for (uint8_t i = 0; i < times; i++)
     {
-        esp_err_t err = gpio_set_level(GPIO_GREEN_LED, 1);
+        esp_err_t err = gpio_set_level(GPIO_BLUE_LED, 1);
         if (err != ESP_OK)
         {
-            ESP_LOGE(TAG, "Error %d setting green LED GPIO to high: %s", err, esp_err_to_name(err));
+            ESP_LOGE(TAG, "Error %d setting blue LED GPIO to high: %s", err, esp_err_to_name(err));
             return ESP_FAIL;
         }
         vTaskDelay(pdMS_TO_TICKS(2000));
-        gpio_set_level(GPIO_GREEN_LED, 0);
+        gpio_set_level(GPIO_BLUE_LED, 0);
         if (err != ESP_OK)
         {
-            ESP_LOGE(TAG, "Error %d setting green LED GPIO to low: %s", err, esp_err_to_name(err));
+            ESP_LOGE(TAG, "Error %d setting blue LED GPIO to low: %s", err, esp_err_to_name(err));
             return ESP_FAIL;
         }
         if (i != times - 1)
@@ -153,28 +159,28 @@ esp_err_t app_gpio__blink_green_led_slow(uint8_t times)
 }
 
 /**
- * @brief Fastly blink green LED for the specified number of times.
+ * @brief Fastly blink blue LED for the specified number of times.
  *
  * @param times Number of times to blink the LED.
  * @return esp_err_t
  * @retval ESP_OK if LED is successfully blinked.
  * @retval ESP_FAIL otherwise.
  */
-esp_err_t app_gpio__blink_green_led_fast(uint8_t times)
+esp_err_t app_gpio__blink_blue_led_fast(uint8_t times)
 {
     for (uint8_t i = 0; i < times; i++)
     {
-        esp_err_t err = gpio_set_level(GPIO_GREEN_LED, 1);
+        esp_err_t err = gpio_set_level(GPIO_BLUE_LED, 1);
         if (err != ESP_OK)
         {
-            ESP_LOGE(TAG, "Error %d setting green LED GPIO to high: %s", err, esp_err_to_name(err));
+            ESP_LOGE(TAG, "Error %d setting blue LED GPIO to high: %s", err, esp_err_to_name(err));
             return ESP_FAIL;
         }
         vTaskDelay(pdMS_TO_TICKS(250));
-        gpio_set_level(GPIO_GREEN_LED, 0);
+        gpio_set_level(GPIO_BLUE_LED, 0);
         if (err != ESP_OK)
         {
-            ESP_LOGE(TAG, "Error %d setting green LED GPIO to low: %s", err, esp_err_to_name(err));
+            ESP_LOGE(TAG, "Error %d setting blue LED GPIO to low: %s", err, esp_err_to_name(err));
             return ESP_FAIL;
         }
         if (i != times - 1)
@@ -253,11 +259,15 @@ esp_err_t app_gpio__blink_red_led_fast(uint8_t times)
 
 static void IRAM_ATTR app_gpio__isr_handler(void *arg)
 {
+    gpio_intr_disable(GPIO_BUTTON);
+    gpio_isr_handler_remove(GPIO_BUTTON);
     if (!button_pressed)
     {
         button_pressed = 1;
         vTaskResume(app_gpio__check_button_task_handle);
     }
+    gpio_isr_handler_add(GPIO_BUTTON, app_gpio__isr_handler, NULL);
+    gpio_intr_enable(GPIO_BUTTON);
 }
 
 static void app_gpio__check_button_task(void *arg)
@@ -286,7 +296,7 @@ static void app_gpio__check_button_task(void *arg)
                     ESP_LOGE(TAG, "Error starting Wi-Fi from %s", __func__);
                     app_error_handling__restart();
                 }
-                app_gpio__blink_green_led_slow(1);
+                app_gpio__blink_blue_led_slow(1);
                 button_hold_time_miliseconds = 0;
                 button_pressed = 0;
                 vTaskSuspend(NULL);
