@@ -31,7 +31,9 @@
 #include "freertos/queue.h"
 
 #include "app_measure_vcc.h"
-#include "app_gpio.h"
+#include "app_status.h"
+
+#define VOLTAGE_MEAS_AVG_ARR_SIZE 10 ///< Voltage measurements average array size
 
 static esp_err_t app_measure_vcc__calibrate_adc(adc_unit_t unit, adc_channel_t channel, adc_atten_t atten, adc_cali_handle_t *out_handle);
 static void app_measure_vcc__adc_read_task(void *args);
@@ -43,7 +45,7 @@ static adc_oneshot_unit_init_cfg_t init_config = {
 };                                                                ///< ADC initialization configuration
 static adc_cali_handle_t adc_cal_handle = NULL;                   ///< ADC calibration handle
 uint8_t calibration_successful = 0;                               ///< Flag to indicate if calibration was successful
-int voltage_measurements[10] = {0};                               ///< Array to store voltage measurements to calculate average
+int voltage_measurements[VOLTAGE_MEAS_AVG_ARR_SIZE] = {0};        ///< Array to store voltage measurements to calculate average
 int voltage_measurements_index = 0;                               ///< Index to keep track of the current measurement
 static TaskHandle_t app_measure_vcc__adc_read_task_handle = NULL; ///< Read ADC task handle
 
@@ -161,20 +163,25 @@ static void app_measure_vcc__adc_read_task(void *args)
             }
             voltage_measurements[voltage_measurements_index] = voltage;
             voltage_measurements_index++;
-            if (voltage_measurements_index == 15)
+            if (voltage_measurements_index == VOLTAGE_MEAS_AVG_ARR_SIZE)
             {
                 voltage_measurements_index = 0;
                 int avg = 0;
-                for (int i = 0; i < 15; i++)
+                for (int i = 0; i < VOLTAGE_MEAS_AVG_ARR_SIZE; i++)
                 {
                     avg += voltage_measurements[i];
                 }
-                avg /= 15;
+                avg /= VOLTAGE_MEAS_AVG_ARR_SIZE;
                 ESP_LOGI(TAG, "Average voltage: %d mV", voltage);
                 if (avg < 2500)
                 {
-                    ESP_LOGI(TAG, "Battery voltage is low!");
-                    // set low battery status
+                    ESP_LOGW(TAG, "Battery voltage is low!");
+                    app_status__set_battery_low_status(1);
+                }
+                else
+                {
+                    ESP_LOGI(TAG, "Battery voltage is ok!");
+                    app_status__set_battery_low_status(0);
                 }
             }
         }

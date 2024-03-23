@@ -226,7 +226,7 @@ esp_err_t app_wifi__stop(void)
     esp_err_t err;
     if (wifi_status != WIFI_OFF)
     {
-        esp_err_t err = esp_wifi_stop();
+        err = esp_wifi_stop();
         if (err != ESP_OK)
         {
             ESP_LOGE(TAG, "Error %d stopping Wi-Fi: %s", err, esp_err_to_name(err));
