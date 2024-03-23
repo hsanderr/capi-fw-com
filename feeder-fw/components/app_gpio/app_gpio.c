@@ -1,7 +1,7 @@
 /**
  * @file app_web_server.c
  * @author Henrique Sander Lourenço (henriquesander27@gmail.com)
- * @brief Contains web GPIO-related code (buttons and LEDs).
+ * @brief Contains GPIO-related code (buttons and LEDs).
  * @version 0.1
  * @date 2024-03-20
  *
@@ -17,7 +17,7 @@
 
     Unless required by applicable law or agreed to in writing, software
     distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.'
     See the License for the specific language governing permissions and
     limitations under the License.
  */
@@ -42,8 +42,8 @@
 #define BUTTON_HOLD_TIME_SECS (3)
 
 static const char *TAG = "app_gpio";                           ///< Tag to be used when logging
-static TaskHandle_t app_gpio__check_button_task_handle = NULL; ///< Button state check task handle
 static uint8_t button_pressed = 0;                             ///< Button state, 1 if pressed, 0 otherwise
+static TaskHandle_t app_gpio__check_button_task_handle = NULL; ///< Button state check task handle
 
 static void IRAM_ATTR app_gpio__isr_handler(void *arg);
 static void app_gpio__check_button_task(void *arg);
@@ -271,6 +271,11 @@ static void IRAM_ATTR app_gpio__isr_handler(void *arg)
     gpio_intr_enable(GPIO_BUTTON);
 }
 
+/**
+ * @brief Task to check if button is being holded for a specified amount of time.
+ *
+ * @param arg Optional argument (not being used).
+ */
 static void app_gpio__check_button_task(void *arg)
 {
     uint16_t button_hold_time_miliseconds = 0;
