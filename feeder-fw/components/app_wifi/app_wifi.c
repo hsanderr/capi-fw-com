@@ -37,6 +37,7 @@
 
 #include "app_wifi.h"
 #include "app_web_server.h"
+#include "app_gpio.h"
 
 #define ESP_WIFI_AP_SSID "PetDog ComeInt"
 #define ESP_WIFI_AP_CHANNEL 1
@@ -46,6 +47,43 @@
 static const char *TAG = "app_wifi"; ///< Tag to be used when logging
 
 static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
+
+/*! @var typedef enum wifi_status
+        {
+            WIFI_OFF,
+            WIFI_ON
+        } wifi_status_t;
+    @brief Typedef for indicating Wi-Fi status.
+ */
+typedef enum wifi_status
+{
+    WIFI_OFF,
+    WIFI_ON
+} wifi_status_t;
+
+static wifi_status_t wifi_status = WIFI_OFF;                 ///< Wi-Fi status
+static uint8_t wifi_timer_reset = 0;                         ///< Wi-Fi timer reset flag
+static TaskHandle_t app_wifi__wifi_timer_task_handle = NULL; ///< Wi-Fi timer task handle
+
+static void app_wifi__wifi_timer_task(void *arg)
+{
+    for (;;)
+    {
+        for (uint8_t i = 0; i < 60; i++)
+        {
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            if (wifi_timer_reset)
+            {
+                i = 0;
+                wifi_timer_reset = 0;
+            }
+            ESP_LOGI(TAG, "Wi-Fi stopping in %d seconds", 60 - i);
+        }
+        app_wifi__stop();
+        vTaskSuspend(NULL);
+    }
+    vTaskDelete(NULL);
+}
 
 /**
  * @brief Initialize Wi-Fi.
@@ -122,6 +160,16 @@ esp_err_t app_wifi__init(void)
                             return ESP_FAIL;
                         }
 
+                        if (xTaskCreate(app_wifi__wifi_timer_task,
+                                        "app_wifi__wifi_timer_task", 2048, NULL, 10,
+                                        &app_wifi__wifi_timer_task_handle) != pdPASS)
+                        {
+                            ESP_LOGE(TAG, "Error creating app_wifi__wifi_timer_task");
+                            return ESP_FAIL;
+                        }
+                        vTaskSuspend(app_wifi__wifi_timer_task_handle);
+                        ESP_LOGI(TAG, "Created app_wifi__wifi_timer_task");
+
                         ESP_LOGI(TAG, "Success initializing Wi-Fi!");
                         return ESP_OK;
                     }
@@ -135,20 +183,33 @@ esp_err_t app_wifi__init(void)
  * @brief Start Wi-Fi.
  *
  * @return esp_err_t
- * @retval ESP_OK if Wi-Fi is successfully started.
+ * @retval ESP_OK if Wi-Fi is successfully started or it's already started.
  * @retval ESP_FAIL otherwise.
  */
 esp_err_t app_wifi__start(void)
 {
-    esp_err_t err = esp_wifi_start();
-    if (err != ESP_OK)
+    esp_err_t err;
+    if (wifi_status != WIFI_ON)
     {
-        ESP_LOGE(TAG, "Error %d starting Wi-Fi: %s", err, esp_err_to_name(err));
-        return ESP_FAIL;
+        err = esp_wifi_start();
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "Error %d starting Wi-Fi: %s", err, esp_err_to_name(err));
+            return ESP_FAIL;
+        }
+        else
+        {
+            ESP_LOGI(TAG, "Wi-Fi started!");
+            wifi_status = WIFI_ON;
+            app_gpio__blink_blue_led_slow(2);
+            vTaskResume(app_wifi__wifi_timer_task_handle);
+            return ESP_OK;
+        }
     }
     else
     {
-        ESP_LOGI(TAG, "Wi-Fi started!");
+        ESP_LOGI(TAG, "Wi-Fi already started");
+        wifi_timer_reset = 1;
         return ESP_OK;
     }
 }
@@ -162,15 +223,27 @@ esp_err_t app_wifi__start(void)
  */
 esp_err_t app_wifi__stop(void)
 {
-    esp_err_t err = esp_wifi_stop();
-    if (err != ESP_OK)
+    esp_err_t err;
+    if (wifi_status != WIFI_OFF)
     {
-        ESP_LOGE(TAG, "Error %d stopping Wi-Fi: %s", err, esp_err_to_name(err));
-        return ESP_FAIL;
+        esp_err_t err = esp_wifi_stop();
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "Error %d stopping Wi-Fi: %s", err, esp_err_to_name(err));
+            return ESP_FAIL;
+        }
+        else
+        {
+            ESP_LOGI(TAG, "Wi-Fi stopped");
+            wifi_status = WIFI_OFF;
+            wifi_timer_reset = 1;
+            app_gpio__blink_blue_led_fast(2);
+            return ESP_OK;
+        }
     }
     else
     {
-        ESP_LOGI(TAG, "Wi-fi stopped");
+        ESP_LOGI(TAG, "Wi-Fi already stopped");
         return ESP_OK;
     }
 }

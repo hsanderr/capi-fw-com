@@ -121,6 +121,7 @@ esp_err_t app_gpio__init(void)
         return ESP_FAIL;
     }
     vTaskSuspend(app_gpio__check_button_task_handle);
+    ESP_LOGI(TAG, "Created app_gpio__check_button_task");
 
     return ESP_OK;
 }
@@ -143,7 +144,7 @@ esp_err_t app_gpio__blink_blue_led_slow(uint8_t times)
             ESP_LOGE(TAG, "Error %d setting blue LED GPIO to high: %s", err, esp_err_to_name(err));
             return ESP_FAIL;
         }
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(1000));
         gpio_set_level(GPIO_BLUE_LED, 0);
         if (err != ESP_OK)
         {
@@ -152,7 +153,7 @@ esp_err_t app_gpio__blink_blue_led_slow(uint8_t times)
         }
         if (i != times - 1)
         {
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
     }
     return ESP_OK;
@@ -209,7 +210,7 @@ esp_err_t app_gpio__blink_red_led_slow(uint8_t times)
             ESP_LOGE(TAG, "Error %d setting red LED GPIO to high: %s", err, esp_err_to_name(err));
             return ESP_FAIL;
         }
-        vTaskDelay(pdMS_TO_TICKS(2000));
+        vTaskDelay(pdMS_TO_TICKS(1000));
         gpio_set_level(GPIO_RED_LED, 0);
         if (err != ESP_OK)
         {
@@ -218,7 +219,7 @@ esp_err_t app_gpio__blink_red_led_slow(uint8_t times)
         }
         if (i != times - 1)
         {
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            vTaskDelay(pdMS_TO_TICKS(1000));
         }
     }
     return ESP_OK;
@@ -289,14 +290,13 @@ static void app_gpio__check_button_task(void *arg)
             button_hold_time_miliseconds += time_increment_miliseconds;
             if (button_hold_time_miliseconds >= (BUTTON_HOLD_TIME_SECS * 1000))
             {
-                ESP_LOGI(TAG, "Button pressed for %d seconds, starting web Wi-Fi", BUTTON_HOLD_TIME_SECS);
+                ESP_LOGI(TAG, "Button pressed for %d seconds, (re)starting web Wi-Fi", BUTTON_HOLD_TIME_SECS);
                 err = app_wifi__start();
                 if (err != ESP_OK)
                 {
                     ESP_LOGE(TAG, "Error starting Wi-Fi from %s", __func__);
                     app_error_handling__restart();
                 }
-                app_gpio__blink_blue_led_slow(1);
                 button_hold_time_miliseconds = 0;
                 button_pressed = 0;
                 vTaskSuspend(NULL);
