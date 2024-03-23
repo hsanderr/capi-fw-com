@@ -32,6 +32,7 @@
 #include "app_nvs.h"
 #include "app_wifi.h"
 #include "app_gpio.h"
+#include "app_measure_vcc.h"
 
 static const char *TAG = "main"; ///< Tag to be used when logging
 
@@ -47,7 +48,7 @@ void app_main(void)
 {
     ESP_LOGI(TAG, "Hello World!");
     esp_err_t err;
-    uint8_t dummy_counter = 0;
+    int dummy_counter = 0;
     err = app_nvs__init();
     if (err != ESP_OK)
     {
@@ -69,9 +70,14 @@ void app_main(void)
         app_error_handling__restart();
     }
     app_gpio__blink_blue_led_slow(1);
+    err = app_measure_vcc__init();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
     for (;;)
     {
-        ESP_LOGI(TAG, "I'm alive! Dummy counter = %d", (int)dummy_counter);
+        ESP_LOGI(TAG, "%d minutes since start-up", dummy_counter);
         dummy_counter++;
         vTaskDelay(60000 / portTICK_PERIOD_MS);
     }
