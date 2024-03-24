@@ -34,6 +34,7 @@
 #include "app_gpio.h"
 #include "app_measure_vcc.h"
 #include "app_status.h"
+#include "app_pwm.h"
 
 static const char *TAG = "main"; ///< Tag to be used when logging
 
@@ -77,6 +78,35 @@ void app_main(void)
         app_error_handling__restart();
     }
     err = app_status__init();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    err = app_pwm__init();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    vTaskDelay(pdMS_TO_TICKS(1500));
+    err = app_pwm__set_duty_max();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    vTaskDelay(pdMS_TO_TICKS(1500));
+    err = app_pwm__set_duty_min();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    vTaskDelay(pdMS_TO_TICKS(1500));
+    err = app_pwm__set_duty_max();
+    if (err != ESP_OK)
+    {
+        app_error_handling__restart();
+    }
+    vTaskDelay(pdMS_TO_TICKS(1500));
+    err = app_pwm__set_duty_min();
     if (err != ESP_OK)
     {
         app_error_handling__restart();
