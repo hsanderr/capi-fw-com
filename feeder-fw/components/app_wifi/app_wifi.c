@@ -69,7 +69,7 @@ static void app_wifi__wifi_timer_task(void *arg)
 {
     for (;;)
     {
-        for (uint8_t i = 0; i < 60; i++)
+        for (uint8_t i = 0; i < 180; i++)
         {
             vTaskDelay(1000 / portTICK_PERIOD_MS);
             if (wifi_timer_reset)

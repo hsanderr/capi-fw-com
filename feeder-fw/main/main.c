@@ -35,6 +35,7 @@
 #include "app_measure_vcc.h"
 #include "app_status.h"
 #include "app_pwm.h"
+#include "app_beacon.h"
 
 static const char *TAG = "main"; ///< Tag to be used when logging
 
@@ -50,7 +51,6 @@ void app_main(void)
 {
     ESP_LOGI(TAG, "Hello World!");
     esp_err_t err;
-    // int dummy_counter = 0;
     err = app_nvs__init();
     if (err != ESP_OK)
     {
@@ -87,34 +87,9 @@ void app_main(void)
     {
         app_error_handling__restart();
     }
-    vTaskDelay(pdMS_TO_TICKS(1500));
-    err = app_pwm__set_duty_max();
+    err = app_beacon__init();
     if (err != ESP_OK)
     {
         app_error_handling__restart();
     }
-    vTaskDelay(pdMS_TO_TICKS(1500));
-    err = app_pwm__set_duty_min();
-    if (err != ESP_OK)
-    {
-        app_error_handling__restart();
-    }
-    vTaskDelay(pdMS_TO_TICKS(1500));
-    err = app_pwm__set_duty_max();
-    if (err != ESP_OK)
-    {
-        app_error_handling__restart();
-    }
-    vTaskDelay(pdMS_TO_TICKS(1500));
-    err = app_pwm__set_duty_min();
-    if (err != ESP_OK)
-    {
-        app_error_handling__restart();
-    }
-    // for (;;)
-    // {
-    //     ESP_LOGI(TAG, "%d minutes since start-up", dummy_counter);
-    //     dummy_counter++;
-    //     vTaskDelay(60000 / portTICK_PERIOD_MS);
-    // }
 }

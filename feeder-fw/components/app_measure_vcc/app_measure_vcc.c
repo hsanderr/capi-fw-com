@@ -180,7 +180,7 @@ static void app_measure_vcc__adc_read_task(void *args)
                 }
                 else
                 {
-                    ESP_LOGI(TAG, "Battery voltage is ok!");
+                    ESP_LOGD(TAG, "Battery voltage is ok!");
                     app_status__set_battery_low_status(0);
                 }
             }

@@ -28,6 +28,7 @@
 #include "nvs_flash.h"
 
 #include "app_nvs.h"
+#include "app_beacon.h"
 
 #define MAIN_NVS_NAMESPACE "nvs_main"       ///< Main NVS namespace
 #define AUTHORIZED_MAC_ENTRY_KEY "auth_mac" ///< Authorized MAC entry key
@@ -116,6 +117,7 @@ esp_err_t app_nvs__set_authorized_mac(uint8_t authorized_mac[6])
         {
             ESP_LOGD(TAG, "Success setting blob in NVS, authorized MAC: 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x",
                      authorized_mac[0], authorized_mac[1], authorized_mac[2], authorized_mac[3], authorized_mac[4], authorized_mac[5]);
+            app_beacon__set_auth_mac(authorized_mac);
             return ESP_OK;
         }
     }
@@ -159,6 +161,7 @@ esp_err_t app_nvs__get_authorized_mac(uint8_t authorized_mac[6])
         {
             ESP_LOGD(TAG, "Success getting blob from NVS, authorized MAC: 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x 0x%2.2x",
                      authorized_mac[0], authorized_mac[1], authorized_mac[2], authorized_mac[3], authorized_mac[4], authorized_mac[5]);
+            app_beacon__set_auth_mac(authorized_mac);
             return ESP_OK;
         }
     }
