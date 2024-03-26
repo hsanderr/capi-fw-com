@@ -112,7 +112,7 @@ esp_err_t app_pwm__set_duty_min(void)
         return ESP_FAIL;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(3000));
+    vTaskDelay(pdMS_TO_TICKS(2000));
 
     err = ledc_timer_pause(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     if (err != ESP_OK)
@@ -154,7 +154,7 @@ esp_err_t app_pwm__set_duty_max(void)
         return ESP_FAIL;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(3000));
+    vTaskDelay(pdMS_TO_TICKS(2000));
 
     err = ledc_timer_pause(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     if (err != ESP_OK)
