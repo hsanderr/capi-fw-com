@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define LOG_LOCAL_LEVEL ESP_LOG_INFO
+#define LOG_LOCAL_LEVEL ESP_LOG_NONE
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_bt.h"
@@ -356,8 +356,8 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                     app_status__set_beacon_battery_low_status(0);
                 }
 
-                /* The beacon.found flag is set to 1 if the beacon is seen 3 times in a short period of time
-                 * and the RSSI is greater than min_rssi. When the beacon is seen 3 times, the lid will be
+                /* The beacon.found flag is set to 1 if the beacon is seen 2 times in a short period of time
+                 * and the RSSI is greater than min_rssi. When the beacon is seen 2 times, the lid will be
                  * opened. This is a debouncing scheme so that the lid does not open when the pet just passes
                  * nearby. Everytime this beacon is seen, the task app_beacon__beacon_check_task is resumed.
                  * This task checks if the number of times that the beacon has been seen when the task was
@@ -369,7 +369,7 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                 {
                     beacon.times_seen++;
                     vTaskResume(app_beacon__beacon_check_task_handle);
-                    if (beacon.times_seen == 3)
+                    if (beacon.times_seen == 2)
                     {
                         ESP_LOGI(TAG, "Beacon detected, opening lid");
                         beacon.found = 1;

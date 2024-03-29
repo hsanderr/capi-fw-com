@@ -25,7 +25,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#define LOG_LOCAL_LEVEL ESP_LOG_INFO
+#define LOG_LOCAL_LEVEL ESP_LOG_NONE
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_http_server.h"

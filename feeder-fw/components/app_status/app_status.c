@@ -22,7 +22,7 @@
     limitations under the License.
  */
 
-#define LOG_LOCAL_LEVEL ESP_LOG_INFO
+#define LOG_LOCAL_LEVEL ESP_LOG_NONE
 #include "esp_log.h"
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
@@ -47,7 +47,7 @@ typedef struct
 {
     uint8_t battery_low : 1;        ///< Indicate that gateway's battery is low
     uint8_t beacon_battery_low : 1; ///< Indicate that beacon's battery is low
-} app_status_t;
+} app_status_t;                     ///< status bla bla bla
 
 app_status_t app_status = {
     .battery_low = 0,
