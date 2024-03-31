@@ -103,7 +103,7 @@ static const char *scan_statuses_str[] = {
     "ble_scan_start_pending",
     "ble_scan_stop_pending",
 };                         ///< BLE scan statuses as strings for debugging
-static int min_rssi = -43; ///< Minimum RSSI for detection (dB)
+static int min_rssi = -41; ///< Minimum RSSI for detection (dB)
 static beacon_t beacon = {
     .auth_mac = {0},
     .found = 0,
@@ -527,7 +527,7 @@ static void app_beacon__beacon_check_task(void *arg)
     for (;;)
     {
         uint8_t beacon_times_seen_prev = beacon.times_seen;
-        vTaskDelay(pdMS_TO_TICKS(2500));
+        vTaskDelay(pdMS_TO_TICKS(3000));
         if (beacon.times_seen == beacon_times_seen_prev)
         {
             beacon.times_seen = 0;
