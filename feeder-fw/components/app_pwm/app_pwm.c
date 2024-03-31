@@ -133,7 +133,7 @@ esp_err_t app_pwm__set_duty_min(void)
  */
 esp_err_t app_pwm__set_duty_max(void)
 {
-    esp_err_t err = ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 131072); // 0.5 ms (min)
+    esp_err_t err = ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 78643); // 0.5 ms (min)
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Error setting PWM duty cycle");

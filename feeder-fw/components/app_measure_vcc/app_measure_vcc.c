@@ -69,7 +69,7 @@ esp_err_t app_measure_vcc__init(void)
         return ESP_FAIL;
     }
     ESP_LOGI(TAG, "Success creating new ADC unit!");
-    err = adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_0, &adc_config);
+    err = adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_0, &adc_config); // GPIO 36 (VP in DevKitC V4)
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Error %d configuring ADC channel: %s", err, esp_err_to_name(err));
