@@ -1,0 +1,165 @@
+\doxysection{C\+:/\+Users/\+P/\+Documents/\+Projeto\+\_\+\+Comedouro\+\_\+\+PIPE/comeint-\/fw/feeder-\/fw/components/app\+\_\+gpio/include/app\+\_\+gpio.h File Reference}
+\hypertarget{app__gpio_8h}{}\label{app__gpio_8h}\index{C:/Users/P/Documents/Projeto\_Comedouro\_PIPE/comeint-\/fw/feeder-\/fw/components/app\_gpio/include/app\_gpio.h@{C:/Users/P/Documents/Projeto\_Comedouro\_PIPE/comeint-\/fw/feeder-\/fw/components/app\_gpio/include/app\_gpio.h}}
+
+
+Main header file of the app\+\_\+gpio component.  
+
+
+{\ttfamily \#include "{}esp\+\_\+err.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__gpio_8h_aab64c1d900239f3ca832b6be9c9a2e7f}{app\+\_\+gpio\+\_\+\+\_\+init}} (void)
+\begin{DoxyCompactList}\small\item\em Initialize GPIOs. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__gpio_8h_ae87409b335e3ce73b4ed82aa29b41ebb}{app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+blue\+\_\+led\+\_\+slow}} (uint8\+\_\+t times)
+\begin{DoxyCompactList}\small\item\em Slowly blink blue LED for the specified number of times. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__gpio_8h_a39a578a8d1d256c21222622e88a4a7b1}{app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+blue\+\_\+led\+\_\+fast}} (uint8\+\_\+t times)
+\begin{DoxyCompactList}\small\item\em Fastly blink blue LED for the specified number of times. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__gpio_8h_afa121ba29f73cfcc115f3818053689d1}{app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+red\+\_\+led\+\_\+slow}} (uint8\+\_\+t times)
+\begin{DoxyCompactList}\small\item\em Slowly blink red LED for the specified number of times. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__gpio_8h_a011945371a726ef101c0539890e08cef}{app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+red\+\_\+led\+\_\+fast}} (uint8\+\_\+t times)
+\begin{DoxyCompactList}\small\item\em Fastly blink red LED for the specified number of times. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Main header file of the app\+\_\+gpio component. 
+
+\begin{DoxyAuthor}{Author}
+Henrique Sander Lourenço (\href{mailto:henriquesander27@gmail.com}{\texttt{ henriquesander27@gmail.\+com}}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/03-\/20
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2024 Pet\+Dog
+\end{DoxyCopyright}
+Copyright 2024 Pet\+Dog
+
+Licensed under the Apache License, Version 2.\+0 (the "{}\+License"{}); you may not use this file except in compliance with the License. You may obtain a copy of the License at \begin{DoxyVerb}http://www.apache.org/licenses/LICENSE-2.0
+\end{DoxyVerb}
+ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "{}\+AS IS"{} BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{app__gpio_8h_a39a578a8d1d256c21222622e88a4a7b1}\label{app__gpio_8h_a39a578a8d1d256c21222622e88a4a7b1} 
+\index{app\_gpio.h@{app\_gpio.h}!app\_gpio\_\_blink\_blue\_led\_fast@{app\_gpio\_\_blink\_blue\_led\_fast}}
+\index{app\_gpio\_\_blink\_blue\_led\_fast@{app\_gpio\_\_blink\_blue\_led\_fast}!app\_gpio.h@{app\_gpio.h}}
+\doxysubsubsection{\texorpdfstring{app\_gpio\_\_blink\_blue\_led\_fast()}{app\_gpio\_\_blink\_blue\_led\_fast()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+blue\+\_\+led\+\_\+fast (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{times }\end{DoxyParamCaption})}
+
+
+
+Fastly blink blue LED for the specified number of times. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em times} & Number of times to blink the LED. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if LED is successfully blinked. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__gpio_8h_ae87409b335e3ce73b4ed82aa29b41ebb}\label{app__gpio_8h_ae87409b335e3ce73b4ed82aa29b41ebb} 
+\index{app\_gpio.h@{app\_gpio.h}!app\_gpio\_\_blink\_blue\_led\_slow@{app\_gpio\_\_blink\_blue\_led\_slow}}
+\index{app\_gpio\_\_blink\_blue\_led\_slow@{app\_gpio\_\_blink\_blue\_led\_slow}!app\_gpio.h@{app\_gpio.h}}
+\doxysubsubsection{\texorpdfstring{app\_gpio\_\_blink\_blue\_led\_slow()}{app\_gpio\_\_blink\_blue\_led\_slow()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+blue\+\_\+led\+\_\+slow (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{times }\end{DoxyParamCaption})}
+
+
+
+Slowly blink blue LED for the specified number of times. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em times} & Number of times to blink the LED. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if LED is successfully blinked. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__gpio_8h_a011945371a726ef101c0539890e08cef}\label{app__gpio_8h_a011945371a726ef101c0539890e08cef} 
+\index{app\_gpio.h@{app\_gpio.h}!app\_gpio\_\_blink\_red\_led\_fast@{app\_gpio\_\_blink\_red\_led\_fast}}
+\index{app\_gpio\_\_blink\_red\_led\_fast@{app\_gpio\_\_blink\_red\_led\_fast}!app\_gpio.h@{app\_gpio.h}}
+\doxysubsubsection{\texorpdfstring{app\_gpio\_\_blink\_red\_led\_fast()}{app\_gpio\_\_blink\_red\_led\_fast()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+red\+\_\+led\+\_\+fast (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{times }\end{DoxyParamCaption})}
+
+
+
+Fastly blink red LED for the specified number of times. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em times} & Number of times to blink the LED. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if LED is successfully blinked. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__gpio_8h_afa121ba29f73cfcc115f3818053689d1}\label{app__gpio_8h_afa121ba29f73cfcc115f3818053689d1} 
+\index{app\_gpio.h@{app\_gpio.h}!app\_gpio\_\_blink\_red\_led\_slow@{app\_gpio\_\_blink\_red\_led\_slow}}
+\index{app\_gpio\_\_blink\_red\_led\_slow@{app\_gpio\_\_blink\_red\_led\_slow}!app\_gpio.h@{app\_gpio.h}}
+\doxysubsubsection{\texorpdfstring{app\_gpio\_\_blink\_red\_led\_slow()}{app\_gpio\_\_blink\_red\_led\_slow()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+gpio\+\_\+\+\_\+blink\+\_\+red\+\_\+led\+\_\+slow (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{times }\end{DoxyParamCaption})}
+
+
+
+Slowly blink red LED for the specified number of times. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em times} & Number of times to blink the LED. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if LED is successfully blinked. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__gpio_8h_aab64c1d900239f3ca832b6be9c9a2e7f}\label{app__gpio_8h_aab64c1d900239f3ca832b6be9c9a2e7f} 
+\index{app\_gpio.h@{app\_gpio.h}!app\_gpio\_\_init@{app\_gpio\_\_init}}
+\index{app\_gpio\_\_init@{app\_gpio\_\_init}!app\_gpio.h@{app\_gpio.h}}
+\doxysubsubsection{\texorpdfstring{app\_gpio\_\_init()}{app\_gpio\_\_init()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+gpio\+\_\+\+\_\+init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Initialize GPIOs. 
+
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if GPIOs are successfully initialized. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}

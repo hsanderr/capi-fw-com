@@ -1,0 +1,101 @@
+\doxysection{C\+:/\+Users/\+P/\+Documents/\+Projeto\+\_\+\+Comedouro\+\_\+\+PIPE/comeint-\/fw/feeder-\/fw/components/app\+\_\+wifi/include/app\+\_\+wifi.h File Reference}
+\hypertarget{app__wifi_8h}{}\label{app__wifi_8h}\index{C:/Users/P/Documents/Projeto\_Comedouro\_PIPE/comeint-\/fw/feeder-\/fw/components/app\_wifi/include/app\_wifi.h@{C:/Users/P/Documents/Projeto\_Comedouro\_PIPE/comeint-\/fw/feeder-\/fw/components/app\_wifi/include/app\_wifi.h}}
+
+
+Main header file of the app\+\_\+wifi component.  
+
+
+{\ttfamily \#include "{}esp\+\_\+err.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__wifi_8h_ab30b6635419fe5e9154368bc49eb3c66}{app\+\_\+wifi\+\_\+\+\_\+init}} (void)
+\begin{DoxyCompactList}\small\item\em Initialize Wi-\/\+Fi. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__wifi_8h_aec396102ccbd61f6e537f93c2c378b0f}{app\+\_\+wifi\+\_\+\+\_\+start}} (void)
+\begin{DoxyCompactList}\small\item\em Start Wi-\/\+Fi. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__wifi_8h_aaffe54057b021d52da478cbdbfe7b64e}{app\+\_\+wifi\+\_\+\+\_\+stop}} (void)
+\begin{DoxyCompactList}\small\item\em Stop Wi-\/\+Fi. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Main header file of the app\+\_\+wifi component. 
+
+\begin{DoxyAuthor}{Author}
+Henrique Sander Lourenço (\href{mailto:henriquesander27@gmail.com}{\texttt{ henriquesander27@gmail.\+com}}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/03-\/16
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2024 Pet\+Dog
+\end{DoxyCopyright}
+Copyright 2024 Pet\+Dog
+
+Licensed under the Apache License, Version 2.\+0 (the "{}\+License"{}); you may not use this file except in compliance with the License. You may obtain a copy of the License at \begin{DoxyVerb}http://www.apache.org/licenses/LICENSE-2.0
+\end{DoxyVerb}
+ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "{}\+AS IS"{} BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{app__wifi_8h_ab30b6635419fe5e9154368bc49eb3c66}\label{app__wifi_8h_ab30b6635419fe5e9154368bc49eb3c66} 
+\index{app\_wifi.h@{app\_wifi.h}!app\_wifi\_\_init@{app\_wifi\_\_init}}
+\index{app\_wifi\_\_init@{app\_wifi\_\_init}!app\_wifi.h@{app\_wifi.h}}
+\doxysubsubsection{\texorpdfstring{app\_wifi\_\_init()}{app\_wifi\_\_init()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+wifi\+\_\+\+\_\+init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Initialize Wi-\/\+Fi. 
+
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if Wi-\/\+Fi i successfully initialized. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__wifi_8h_aec396102ccbd61f6e537f93c2c378b0f}\label{app__wifi_8h_aec396102ccbd61f6e537f93c2c378b0f} 
+\index{app\_wifi.h@{app\_wifi.h}!app\_wifi\_\_start@{app\_wifi\_\_start}}
+\index{app\_wifi\_\_start@{app\_wifi\_\_start}!app\_wifi.h@{app\_wifi.h}}
+\doxysubsubsection{\texorpdfstring{app\_wifi\_\_start()}{app\_wifi\_\_start()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+wifi\+\_\+\+\_\+start (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Start Wi-\/\+Fi. 
+
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if Wi-\/\+Fi is successfully started or it\textquotesingle{}s already started. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__wifi_8h_aaffe54057b021d52da478cbdbfe7b64e}\label{app__wifi_8h_aaffe54057b021d52da478cbdbfe7b64e} 
+\index{app\_wifi.h@{app\_wifi.h}!app\_wifi\_\_stop@{app\_wifi\_\_stop}}
+\index{app\_wifi\_\_stop@{app\_wifi\_\_stop}!app\_wifi.h@{app\_wifi.h}}
+\doxysubsubsection{\texorpdfstring{app\_wifi\_\_stop()}{app\_wifi\_\_stop()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+wifi\+\_\+\+\_\+stop (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Stop Wi-\/\+Fi. 
+
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if Wi-\/\+Fi is successfully stopped. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}

@@ -1,0 +1,101 @@
+\doxysection{C\+:/\+Users/\+P/\+Documents/\+Projeto\+\_\+\+Comedouro\+\_\+\+PIPE/comeint-\/fw/feeder-\/fw/components/app\+\_\+pwm/include/app\+\_\+pwm.h File Reference}
+\hypertarget{app__pwm_8h}{}\label{app__pwm_8h}\index{C:/Users/P/Documents/Projeto\_Comedouro\_PIPE/comeint-\/fw/feeder-\/fw/components/app\_pwm/include/app\_pwm.h@{C:/Users/P/Documents/Projeto\_Comedouro\_PIPE/comeint-\/fw/feeder-\/fw/components/app\_pwm/include/app\_pwm.h}}
+
+
+Main header file of the app\+\_\+pwm component.  
+
+
+{\ttfamily \#include "{}esp\+\_\+err.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__pwm_8h_a7750082f90c0eb218f0f272b4790ddeb}{app\+\_\+pwm\+\_\+\+\_\+init}} (void)
+\begin{DoxyCompactList}\small\item\em Initialize PWM and pause related timer. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__pwm_8h_aed0f2d5dd5a9aba1ca7d3ba78aad9694}{app\+\_\+pwm\+\_\+\+\_\+set\+\_\+duty\+\_\+min}} (void)
+\begin{DoxyCompactList}\small\item\em Set PWM duty cycle to minimum (close feeder lid), resume and pause timer. \end{DoxyCompactList}\item 
+esp\+\_\+err\+\_\+t \mbox{\hyperlink{app__pwm_8h_aec0f389b30c4d56a3567278e2f2b10f7}{app\+\_\+pwm\+\_\+\+\_\+set\+\_\+duty\+\_\+max}} (void)
+\begin{DoxyCompactList}\small\item\em Set PWM duty cycle to maximum (open feeder lid), resume and pause timer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Main header file of the app\+\_\+pwm component. 
+
+\begin{DoxyAuthor}{Author}
+Henrique Sander Lourenço (\href{mailto:henriquesander27@gmail.com}{\texttt{ henriquesander27@gmail.\+com}}) 
+\end{DoxyAuthor}
+\begin{DoxyVersion}{Version}
+0.\+1 
+\end{DoxyVersion}
+\begin{DoxyDate}{Date}
+2024-\/03-\/24
+\end{DoxyDate}
+\begin{DoxyCopyright}{Copyright}
+Copyright (c) 2024 Pet\+Dog
+\end{DoxyCopyright}
+Copyright 2024 Pet\+Dog
+
+Licensed under the Apache License, Version 2.\+0 (the "{}\+License"{}); you may not use this file except in compliance with the License. You may obtain a copy of the License at \begin{DoxyVerb}http://www.apache.org/licenses/LICENSE-2.0
+\end{DoxyVerb}
+ Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "{}\+AS IS"{} BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License. 
+
+\doxysubsection{Function Documentation}
+\Hypertarget{app__pwm_8h_a7750082f90c0eb218f0f272b4790ddeb}\label{app__pwm_8h_a7750082f90c0eb218f0f272b4790ddeb} 
+\index{app\_pwm.h@{app\_pwm.h}!app\_pwm\_\_init@{app\_pwm\_\_init}}
+\index{app\_pwm\_\_init@{app\_pwm\_\_init}!app\_pwm.h@{app\_pwm.h}}
+\doxysubsubsection{\texorpdfstring{app\_pwm\_\_init()}{app\_pwm\_\_init()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+pwm\+\_\+\+\_\+init (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Initialize PWM and pause related timer. 
+
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if PWM is successfully initialized. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__pwm_8h_aec0f389b30c4d56a3567278e2f2b10f7}\label{app__pwm_8h_aec0f389b30c4d56a3567278e2f2b10f7} 
+\index{app\_pwm.h@{app\_pwm.h}!app\_pwm\_\_set\_duty\_max@{app\_pwm\_\_set\_duty\_max}}
+\index{app\_pwm\_\_set\_duty\_max@{app\_pwm\_\_set\_duty\_max}!app\_pwm.h@{app\_pwm.h}}
+\doxysubsubsection{\texorpdfstring{app\_pwm\_\_set\_duty\_max()}{app\_pwm\_\_set\_duty\_max()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+pwm\+\_\+\+\_\+set\+\_\+duty\+\_\+max (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Set PWM duty cycle to maximum (open feeder lid), resume and pause timer. 
+
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if PWM duty cycle is successfully set to maximum. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{app__pwm_8h_aed0f2d5dd5a9aba1ca7d3ba78aad9694}\label{app__pwm_8h_aed0f2d5dd5a9aba1ca7d3ba78aad9694} 
+\index{app\_pwm.h@{app\_pwm.h}!app\_pwm\_\_set\_duty\_min@{app\_pwm\_\_set\_duty\_min}}
+\index{app\_pwm\_\_set\_duty\_min@{app\_pwm\_\_set\_duty\_min}!app\_pwm.h@{app\_pwm.h}}
+\doxysubsubsection{\texorpdfstring{app\_pwm\_\_set\_duty\_min()}{app\_pwm\_\_set\_duty\_min()}}
+{\footnotesize\ttfamily esp\+\_\+err\+\_\+t app\+\_\+pwm\+\_\+\+\_\+set\+\_\+duty\+\_\+min (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+Set PWM duty cycle to minimum (close feeder lid), resume and pause timer. 
+
+\begin{DoxyReturn}{Returns}
+esp\+\_\+err\+\_\+t 
+\end{DoxyReturn}
+
+\begin{DoxyRetVals}{Return values}
+{\em ESP\+\_\+\+OK} & if PWM duty cycle is successfully set to minimum. \\
+\hline
+{\em ESP\+\_\+\+FAIL} & otherwise. \\
+\hline
+\end{DoxyRetVals}

@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define LOG_LOCAL_LEVEL ESP_LOG_NONE
+#define LOG_LOCAL_LEVEL ESP_LOG_NONE ///< Defines the log level. See https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/log.html for more information
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_bt.h"
@@ -38,39 +38,20 @@
 #include "app_status.h"
 #include "app_pwm.h"
 
-#define SCAN_FILTER_MAC (1)     ///< Filter scan by MAC address
-#define SCAN_FILTER_RSSI (0)    ///< Filter scan by RSSI
-#define SCAN_FILTER_EDD_TLM (1) ///< Filter scan by data type (Eddystone TLM)
-#define PRINT_ADV_DATA (0)      ///< Print advertisements data
+#define SCAN_FILTER_MAC (1)     ///< Filter scan by MAC address (0: False, other: True)
+#define SCAN_FILTER_RSSI (0)    ///< Filter scan by RSSI (0: False, other: True)
+#define SCAN_FILTER_EDD_TLM (1) ///< Filter scan by data type (Eddystone TLM) (0: False, other: True)
+#define PRINT_ADV_DATA (0)      ///< Print advertisements raw data (0: False, other: True)
 
-/*! @var typedef struct
-    {
-        esp_bd_addr_t auth_mac;
-        uint8_t found;
-        uint16_t times_seen_2_sec;
-    } beacon_t;
-    @brief Typedef to store beacon information.
- */
+/// @brief Typedef to store information about the beacon.
 typedef struct
 {
-    esp_bd_addr_t auth_mac;
-    uint8_t found;
-    uint16_t times_seen;
+    esp_bd_addr_t auth_mac; ///< Authorized MAC address (beacon's MAC address).
+    uint8_t found;          ///< Flag that indicates if the beacon has been detected. Set to true (1) when the beacon's advertisement is scanned multiple times in a short period of time.
+    uint16_t times_seen;    ///< Number of times that the beacon has been seen in a short period of time.
 } beacon_t;
 
-/*! @var typedef enum
-    {
-        ble_scan_uninit = 0,
-        ble_scan_initialing,
-        ble_scan_off,
-        ble_scan_starting,
-        ble_scan_on,
-        ble_scan_stopping,
-        ble_scan_start_pending,
-        ble_scan_stop_pending,
-    } ble_scan_status_t;
-    @brief Typedef for indicating current BLE status.
- */
+/// @brief Typedef for storing the status of the BLE scan.
 typedef enum
 {
     ble_scan_uninit = 0,    /**< BLE scan uninitialized */
