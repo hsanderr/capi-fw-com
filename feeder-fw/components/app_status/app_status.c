@@ -104,7 +104,7 @@ static void app_status__check_status_task(void *arg)
         {
             ESP_LOGI(TAG, "All batteries ok!");
         }
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
     vTaskDelete(NULL);
 }
