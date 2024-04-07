@@ -103,7 +103,7 @@ static const char *scan_statuses_str[] = {
     "ble_scan_start_pending",
     "ble_scan_stop_pending",
 };                         ///< BLE scan statuses as strings for debugging
-static int min_rssi = -41; ///< Minimum RSSI for detection (dB)
+static int min_rssi = -40; ///< Minimum RSSI for detection (dB)
 static beacon_t beacon = {
     .auth_mac = {0},
     .found = 0,

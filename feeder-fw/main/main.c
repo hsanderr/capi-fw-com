@@ -87,6 +87,8 @@ void app_main(void)
     {
         app_error_handling__restart();
     }
+    // app_pwm__set_duty_max();
+    // app_pwm__set_duty_min();
     err = app_beacon__init();
     if (err != ESP_OK)
     {
