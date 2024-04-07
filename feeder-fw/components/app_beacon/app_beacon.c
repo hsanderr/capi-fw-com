@@ -47,7 +47,7 @@
     {
         esp_bd_addr_t auth_mac;
         uint8_t found;
-        uint8_t times_seen_2_sec;
+        uint16_t times_seen_2_sec;
     } beacon_t;
     @brief Typedef to store beacon information.
  */
@@ -55,7 +55,7 @@ typedef struct
 {
     esp_bd_addr_t auth_mac;
     uint8_t found;
-    uint8_t times_seen;
+    uint16_t times_seen;
 } beacon_t;
 
 /*! @var typedef enum
@@ -89,8 +89,8 @@ static esp_ble_scan_params_t ble_scan_params = {
     .scan_type = BLE_SCAN_TYPE_PASSIVE,
     .own_addr_type = BLE_ADDR_TYPE_PUBLIC,
     .scan_filter_policy = BLE_SCAN_FILTER_ALLOW_ALL,
-    .scan_interval = 1600, // scan interval (ms) = 1600 * 0.625 = 1000 ms
-    .scan_window = 800,    // scan window (ms) = 800 * 0.625 = 500 ms
+    .scan_interval = 500, // scan interval (ms) = 500 * 0.625 = 500 ms
+    .scan_window = 400,   // scan window (ms) = 400 * 0.625 = 250 ms
     .scan_duplicate = BLE_SCAN_DUPLICATE_DISABLE,
 }; ///< BLE scan parameters
 static const char *scan_statuses_str[] = {
@@ -103,7 +103,7 @@ static const char *scan_statuses_str[] = {
     "ble_scan_start_pending",
     "ble_scan_stop_pending",
 };                         ///< BLE scan statuses as strings for debugging
-static int min_rssi = -41; ///< Minimum RSSI for detection (dB)
+static int min_rssi = -47; ///< Minimum RSSI for detection (dB)
 static beacon_t beacon = {
     .auth_mac = {0},
     .found = 0,
@@ -368,13 +368,13 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                 if (!beacon.found && scan_result->scan_rst.rssi >= min_rssi)
                 {
                     beacon.times_seen++;
-                    vTaskResume(app_beacon__beacon_check_task_handle);
-                    if (beacon.times_seen == 2)
+                    if (beacon.times_seen == 3)
                     {
                         ESP_LOGI(TAG, "Beacon detected, opening lid");
                         beacon.found = 1;
                         app_pwm__set_duty_max();
                     }
+                    vTaskResume(app_beacon__beacon_check_task_handle);
                 }
                 else if (scan_result->scan_rst.rssi >= min_rssi)
                 {
@@ -526,9 +526,9 @@ static void app_beacon__beacon_check_task(void *arg)
 {
     for (;;)
     {
-        uint8_t beacon_times_seen_prev = beacon.times_seen;
-        vTaskDelay(pdMS_TO_TICKS(3000));
-        if (beacon.times_seen == beacon_times_seen_prev)
+        uint16_t beacon_times_seen_prev = beacon.times_seen;
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        if (beacon.times_seen - beacon_times_seen_prev == 0)
         {
             beacon.times_seen = 0;
             if (beacon.found)

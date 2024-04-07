@@ -22,7 +22,7 @@
     limitations under the License.
  */
 
-#define LOG_LOCAL_LEVEL ESP_LOG_NONE
+#define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
 #include "freertos/FreeRTOS.h"
@@ -112,7 +112,7 @@ esp_err_t app_pwm__set_duty_min(void)
         return ESP_FAIL;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(2000));
+    vTaskDelay(pdMS_TO_TICKS(500));
 
     err = ledc_timer_pause(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     if (err != ESP_OK)
@@ -133,7 +133,7 @@ esp_err_t app_pwm__set_duty_min(void)
  */
 esp_err_t app_pwm__set_duty_max(void)
 {
-    esp_err_t err = ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 78643); // 0.5 ms (min)
+    esp_err_t err = ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, 78000);
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Error setting PWM duty cycle");
@@ -154,7 +154,7 @@ esp_err_t app_pwm__set_duty_max(void)
         return ESP_FAIL;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(2000));
+    vTaskDelay(pdMS_TO_TICKS(500));
 
     err = ledc_timer_pause(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
     if (err != ESP_OK)
