@@ -528,7 +528,7 @@ static void app_beacon__beacon_check_task(void *arg)
     {
         uint16_t beacon_times_seen_prev = beacon.times_seen;
         vTaskDelay(pdMS_TO_TICKS(time_to_wait_before_check));
-        if (time_to_wait_before_check >= 750)
+        if (time_to_wait_before_check >= 1250)
         {
             time_to_wait_before_check -= 250;
         }
