@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define LOG_LOCAL_LEVEL ESP_LOG_NONE
+#define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_bt.h"
@@ -103,7 +103,7 @@ static const char *scan_statuses_str[] = {
     "ble_scan_start_pending",
     "ble_scan_stop_pending",
 };                         ///< BLE scan statuses as strings for debugging
-static int min_rssi = -47; ///< Minimum RSSI for detection (dB)
+static int min_rssi = -48; ///< Minimum RSSI for detection (dB)
 static beacon_t beacon = {
     .auth_mac = {0},
     .found = 0,
@@ -338,12 +338,12 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                 uint8_t beacon_temp_c_dec =
                     (scan_result->scan_rst.ble_adv[13 + 3] * 100) / 255; // get decimal part of beacon temperature in degrees Celsius
 
-                ESP_LOGI(TAG, "Beacon battery: %" PRIu16 " mV",
-                         beacon_bat_mv);
-                ESP_LOGI(TAG,
-                         "Beacon temperature: %" PRId8 ".%" PRIu8
-                         " degrees Celsius",
-                         beacon_temp_c_int, beacon_temp_c_dec);
+                // ESP_LOGI(TAG, "Beacon battery: %" PRIu16 " mV",
+                //  beacon_bat_mv);
+                // ESP_LOGI(TAG,
+                //  "Beacon temperature: %" PRId8 ".%" PRIu8
+                //  " degrees Celsius",
+                //  beacon_temp_c_int, beacon_temp_c_dec);
 
                 if (beacon_bat_mv < 3000)
                 {
@@ -365,21 +365,20 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                  * numbers are not different, it means that the beacon has not been seen for some time and
                  * in this case the lid will be closed and beacon.found will be set to zero.
                  */
-                if (!beacon.found && scan_result->scan_rst.rssi >= min_rssi)
+                if (scan_result->scan_rst.rssi >= min_rssi)
                 {
-                    beacon.times_seen++;
-                    if (beacon.times_seen == 3)
+                    if (beacon.times_seen <= 5)
+                        beacon.times_seen++;
+                    if (!beacon.found)
                     {
-                        ESP_LOGI(TAG, "Beacon detected, opening lid");
-                        beacon.found = 1;
-                        app_pwm__set_duty_max();
+                        if (beacon.times_seen >= 4)
+                        {
+                            ESP_LOGI(TAG, "Beacon detected, opening lid");
+                            beacon.found = 1;
+                            app_pwm__set_duty_max();
+                            vTaskResume(app_beacon__beacon_check_task_handle);
+                        }
                     }
-                    vTaskResume(app_beacon__beacon_check_task_handle);
-                }
-                else if (scan_result->scan_rst.rssi >= min_rssi)
-                {
-                    beacon.times_seen++;
-                    vTaskResume(app_beacon__beacon_check_task_handle);
                 }
             }
         }
@@ -524,20 +523,26 @@ void app_beacon__set_auth_mac(uint8_t mac_addr[6])
  */
 static void app_beacon__beacon_check_task(void *arg)
 {
+    uint16_t time_to_wait_before_check = 1500;
     for (;;)
     {
         uint16_t beacon_times_seen_prev = beacon.times_seen;
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        if (beacon.times_seen - beacon_times_seen_prev == 0)
+        vTaskDelay(pdMS_TO_TICKS(time_to_wait_before_check));
+        if (time_to_wait_before_check >= 750)
         {
-            beacon.times_seen = 0;
-            if (beacon.found)
+            time_to_wait_before_check -= 250;
+        }
+        if (beacon.found && (beacon.times_seen - beacon_times_seen_prev == 0) && beacon.times_seen)
+        {
+            beacon.times_seen--;
+            if (beacon.times_seen == 0)
             {
                 beacon.found = 0;
                 ESP_LOGI(TAG, "Beacon lost, closing lid");
                 app_pwm__set_duty_min();
+                vTaskSuspend(NULL);
+                time_to_wait_before_check = 1500;
             }
-            vTaskSuspend(NULL);
         }
     }
     vTaskDelete(NULL);
