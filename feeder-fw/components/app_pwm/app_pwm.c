@@ -31,7 +31,13 @@
 
 #include "app_pwm.h"
 
+#define PWM_TIMER_TIME_TO_PAUSE_MS (500) ///< Time to wait after resuming PWM timer to pause it, in order to save energy
+
 static const char *TAG = "app_pwm"; ///< Tag to be used when logging
+
+static TaskHandle_t app_pwm__pwm_timer_pause_task_handle = NULL; ///< PWM timer pause task handle
+
+static void app_pwm__pwm_timer_pause_task(void *arg);
 
 /**
  * @brief Initialize PWM and pause related timer.
@@ -79,6 +85,14 @@ esp_err_t app_pwm__init(void)
         return ESP_FAIL;
     }
 
+    if (xTaskCreate(app_pwm__pwm_timer_pause_task,
+                    "app_pwm__pwm_timer_pause_task", 2048, NULL, 10,
+                    &app_pwm__pwm_timer_pause_task_handle) != pdPASS)
+    {
+        ESP_LOGE(TAG, "Error creating app_pwm__pwm_timer_pause_task");
+        return ESP_FAIL;
+    }
+
     return app_pwm__set_duty_min();
 }
 
@@ -112,14 +126,7 @@ esp_err_t app_pwm__set_duty_min(void)
         return ESP_FAIL;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(500));
-
-    err = ledc_timer_pause(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Error pausing PWM timer");
-        return ESP_FAIL;
-    }
+    vTaskResume(app_pwm__pwm_timer_pause_task_handle);
 
     return ESP_OK;
 }
@@ -154,14 +161,28 @@ esp_err_t app_pwm__set_duty_max(void)
         return ESP_FAIL;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(500));
-
-    err = ledc_timer_pause(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "Error pausing PWM timer");
-        return ESP_FAIL;
-    }
+    vTaskResume(app_pwm__pwm_timer_pause_task_handle);
 
     return ESP_OK;
+}
+
+/**
+ * @brief Task to pause PWM timer after a specified time.
+ *
+ * @param arg
+ */
+static void app_pwm__pwm_timer_pause_task(void *arg)
+{
+    vTaskSuspend(NULL);
+    for (;;)
+    {
+        vTaskDelay(pdMS_TO_TICKS(PWM_TIMER_TIME_TO_PAUSE_MS));
+        esp_err_t err = ledc_timer_pause(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
+        if (err != ESP_OK)
+        {
+            ESP_LOGE(TAG, "Error pausing PWM timer");
+        }
+        vTaskSuspend(NULL);
+    }
+    vTaskDelete(NULL);
 }

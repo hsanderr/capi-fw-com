@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define LOG_LOCAL_LEVEL ESP_LOG_NONE
+#define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_bt.h"
@@ -38,10 +38,16 @@
 #include "app_status.h"
 #include "app_pwm.h"
 
-#define SCAN_FILTER_MAC (1)     ///< Filter scan by MAC address
-#define SCAN_FILTER_RSSI (0)    ///< Filter scan by RSSI
-#define SCAN_FILTER_EDD_TLM (1) ///< Filter scan by data type (Eddystone TLM)
-#define PRINT_ADV_DATA (0)      ///< Print advertisements data
+#define SCAN_FILTER_MAC (1)                              ///< Filter scan by MAC address
+#define SCAN_FILTER_RSSI (0)                             ///< Filter scan by RSSI
+#define SCAN_FILTER_EDD_TLM (1)                          ///< Filter scan by data type (Eddystone TLM)
+#define PRINT_ADV_DATA (0)                               ///< Print advertisements data
+#define RSSI_MOVING_AVG_NUM_OF_SAMPLES (8)               ///< Number of samples for RSSI moving average
+#define MIN_RSSI_FOR_DETECTION_DBM (-48)                 ///< Minimum RSSI for detection (dBm)
+#define MIN_TIMES_SEEN_FOR_DETECTION (3)                 ///< Minimum times the beacon has to be seen with a sufficient RSSI and within a short period of time for detection
+#define TIME_BEFORE_BEACON_LOST_CHECK_INIT_VAL_MS (1000) ///< Initial value for time before checking if beacon has been lost (ms)
+#define TIME_BEFORE_BEACON_LOST_CHECK_DECREMENT_MS (500) ///< Decrement for time before checking if beacon has been lost (ms)
+#define MAX_TIMES_SEEN (4)                               ///< Limit of number of times that the beacon has been seen in a short period of time
 
 /*! @var typedef struct
     {
@@ -89,7 +95,7 @@ static esp_ble_scan_params_t ble_scan_params = {
     .scan_type = BLE_SCAN_TYPE_PASSIVE,
     .own_addr_type = BLE_ADDR_TYPE_PUBLIC,
     .scan_filter_policy = BLE_SCAN_FILTER_ALLOW_ALL,
-    .scan_interval = 500, // scan interval (ms) = 500 * 0.625 = 500 ms
+    .scan_interval = 400, // scan interval (ms) = 400 * 0.625 = 250 ms
     .scan_window = 400,   // scan window (ms) = 400 * 0.625 = 250 ms
     .scan_duplicate = BLE_SCAN_DUPLICATE_DISABLE,
 }; ///< BLE scan parameters
@@ -102,13 +108,18 @@ static const char *scan_statuses_str[] = {
     "ble_scan_stopping",
     "ble_scan_start_pending",
     "ble_scan_stop_pending",
-};                         ///< BLE scan statuses as strings for debugging
-static int min_rssi = -47; ///< Minimum RSSI for detection (dB)
+}; ///< BLE scan statuses as strings for debugging
 static beacon_t beacon = {
     .auth_mac = {0},
     .found = 0,
     .times_seen = 0,
-};                                                               ///< Variable that holds beacon information                                                              ///< Beacon information
+};                                                                        ///< Variable that holds beacon informatio
+static int rssi_moving_avg_samples[RSSI_MOVING_AVG_NUM_OF_SAMPLES] = {0}; ///< Array with RSSI moving average samples
+static uint8_t rssi_moving_avg_samples_index = 0;                         /** Index of RSSI moving average to keep track of
+                                                                           * which position the samples are supposed to be stored in */
+static uint8_t rssi_moving_avg_ready = 0;                                 /** Flag that indicates if RSSI moving average is ready, so that its
+                                                                           * result is only used after collecting the sufficient ammount of samples */
+float rssi_moving_avg_result_prev = 0;
 static TaskHandle_t app_beacon__beacon_check_task_handle = NULL; ///< Beacon lost check task handle
 
 static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param);
@@ -202,8 +213,6 @@ esp_err_t app_beacon__init(void)
         ESP_LOGE(TAG, "Error creating app_beacon__beacon_check_task");
         return ESP_FAIL;
     }
-    vTaskSuspend(app_beacon__beacon_check_task_handle);
-    ESP_LOGI(TAG, "Created app_beacon__beacon_check_task");
 
     return err;
 }
@@ -279,6 +288,8 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
         // BLE scan results ready
 
         esp_ble_gap_cb_param_t *scan_result = (esp_ble_gap_cb_param_t *)param;
+        float rssi_moving_avg_result = 0;
+
         if (scan_result->scan_rst.search_evt == ESP_GAP_SEARCH_INQ_RES_EVT)
         {
             if (1
@@ -293,7 +304,7 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
 #endif // SCAN_FILTER_MAC
 #if SCAN_FILTER_RSSI
                 // check if advertisement RSSI is higher than minimum (this is also checked later when detecting beacon)
-                && (scan_result->scan_rst.rssi > min_rssi)
+                && (scan_result->scan_rst.rssi > MIN_RSSI_FOR_DETECTION_DBM)
 #endif // SCAN_FILTER_RSSI
 #if SCAN_FILTER_EDD_TLM
                 // check if advertisement is in Eddystone TLM format
@@ -331,6 +342,44 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                 }
                 printf("\n");
 #endif // PRINT_ADV_DATA
+                rssi_moving_avg_samples[rssi_moving_avg_samples_index] = scan_result->scan_rst.rssi;
+                rssi_moving_avg_samples_index++;
+                if (!rssi_moving_avg_ready)
+                {
+                    if (rssi_moving_avg_samples_index < (RSSI_MOVING_AVG_NUM_OF_SAMPLES - 1))
+                    {
+                        ESP_LOGI(TAG, "RSSI moving average is not ready yet");
+                        return;
+                    }
+                    else
+                    {
+                        rssi_moving_avg_ready = 1;
+                    }
+                }
+                rssi_moving_avg_result = 0;
+                for (uint8_t i = 0; i < RSSI_MOVING_AVG_NUM_OF_SAMPLES; i++)
+                {
+                    rssi_moving_avg_result += rssi_moving_avg_samples[i];
+                }
+                rssi_moving_avg_result /= RSSI_MOVING_AVG_NUM_OF_SAMPLES;
+                if (rssi_moving_avg_result_prev != 0)
+                {
+                    if (rssi_moving_avg_result > rssi_moving_avg_result_prev + 2)
+                    {
+                        rssi_moving_avg_result = rssi_moving_avg_result_prev + 2;
+                    }
+                    else if (rssi_moving_avg_result < rssi_moving_avg_result_prev - 2)
+                    {
+                        rssi_moving_avg_result = rssi_moving_avg_result_prev - 2;
+                    }
+                }
+                if (rssi_moving_avg_samples_index == RSSI_MOVING_AVG_NUM_OF_SAMPLES)
+                {
+                    rssi_moving_avg_samples_index = 0;
+                }
+                ESP_LOGI(TAG, "RSSI moving average: %2.2f dBm, previous: %2.2f dBm", rssi_moving_avg_result, rssi_moving_avg_result_prev);
+                rssi_moving_avg_result_prev = rssi_moving_avg_result;
+
                 uint16_t beacon_bat_mv =
                     (scan_result->scan_rst.ble_adv[10 + 3] << 8) | scan_result->scan_rst.ble_adv[11 + 3]; // get beacon battery level in mV
                 int8_t beacon_temp_c_int =
@@ -338,12 +387,12 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                 uint8_t beacon_temp_c_dec =
                     (scan_result->scan_rst.ble_adv[13 + 3] * 100) / 255; // get decimal part of beacon temperature in degrees Celsius
 
-                ESP_LOGI(TAG, "Beacon battery: %" PRIu16 " mV",
-                         beacon_bat_mv);
-                ESP_LOGI(TAG,
-                         "Beacon temperature: %" PRId8 ".%" PRIu8
-                         " degrees Celsius",
-                         beacon_temp_c_int, beacon_temp_c_dec);
+                // ESP_LOGI(TAG, "Beacon battery: %" PRIu16 " mV",
+                //  beacon_bat_mv);
+                // ESP_LOGI(TAG,
+                //  "Beacon temperature: %" PRId8 ".%" PRIu8
+                //  " degrees Celsius",
+                //  beacon_temp_c_int, beacon_temp_c_dec);
 
                 if (beacon_bat_mv < 3000)
                 {
@@ -357,7 +406,7 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                 }
 
                 /* The beacon.found flag is set to 1 if the beacon is seen 2 times in a short period of time
-                 * and the RSSI is greater than min_rssi. When the beacon is seen 2 times, the lid will be
+                 * and the RSSI is greater than MIN_RSSI_FOR_DETECTION_DBM. When the beacon is seen 2 times, the lid will be
                  * opened. This is a debouncing scheme so that the lid does not open when the pet just passes
                  * nearby. Everytime this beacon is seen, the task app_beacon__beacon_check_task is resumed.
                  * This task checks if the number of times that the beacon has been seen when the task was
@@ -365,21 +414,20 @@ static void app_beacon__ble_gap_cb(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_
                  * numbers are not different, it means that the beacon has not been seen for some time and
                  * in this case the lid will be closed and beacon.found will be set to zero.
                  */
-                if (!beacon.found && scan_result->scan_rst.rssi >= min_rssi)
+                if (rssi_moving_avg_result >= MIN_RSSI_FOR_DETECTION_DBM)
                 {
-                    beacon.times_seen++;
-                    if (beacon.times_seen == 3)
+                    if (beacon.times_seen < MAX_TIMES_SEEN)
+                        beacon.times_seen++;
+                    if (!beacon.found)
                     {
-                        ESP_LOGI(TAG, "Beacon detected, opening lid");
-                        beacon.found = 1;
-                        app_pwm__set_duty_max();
+                        if (beacon.times_seen >= MIN_TIMES_SEEN_FOR_DETECTION)
+                        {
+                            ESP_LOGI(TAG, "Beacon detected, opening lid");
+                            beacon.found = 1;
+                            app_pwm__set_duty_max();
+                            vTaskResume(app_beacon__beacon_check_task_handle);
+                        }
                     }
-                    vTaskResume(app_beacon__beacon_check_task_handle);
-                }
-                else if (scan_result->scan_rst.rssi >= min_rssi)
-                {
-                    beacon.times_seen++;
-                    vTaskResume(app_beacon__beacon_check_task_handle);
                 }
             }
         }
@@ -524,20 +572,32 @@ void app_beacon__set_auth_mac(uint8_t mac_addr[6])
  */
 static void app_beacon__beacon_check_task(void *arg)
 {
+    uint16_t time_to_wait_before_check = TIME_BEFORE_BEACON_LOST_CHECK_INIT_VAL_MS;
+    vTaskSuspend(NULL);
     for (;;)
     {
         uint16_t beacon_times_seen_prev = beacon.times_seen;
-        vTaskDelay(pdMS_TO_TICKS(2000));
-        if (beacon.times_seen - beacon_times_seen_prev == 0)
+        ESP_LOGI(TAG, "waiting for %d ms to check if beacon has been lost, beacon.times_seen=%d", time_to_wait_before_check, (int)beacon.times_seen);
+        vTaskDelay(pdMS_TO_TICKS(time_to_wait_before_check));
+        if (beacon.found && (beacon.times_seen - beacon_times_seen_prev == 0) && beacon.times_seen)
         {
-            beacon.times_seen = 0;
-            if (beacon.found)
+            beacon.times_seen--;
+            if (beacon.times_seen == 0)
             {
                 beacon.found = 0;
                 ESP_LOGI(TAG, "Beacon lost, closing lid");
                 app_pwm__set_duty_min();
+                vTaskSuspend(NULL);
+                time_to_wait_before_check = TIME_BEFORE_BEACON_LOST_CHECK_INIT_VAL_MS;
             }
-            vTaskSuspend(NULL);
+            else if (time_to_wait_before_check >= 750)
+            {
+                time_to_wait_before_check -= TIME_BEFORE_BEACON_LOST_CHECK_DECREMENT_MS;
+            }
+        }
+        else
+        {
+            time_to_wait_before_check = TIME_BEFORE_BEACON_LOST_CHECK_INIT_VAL_MS;
         }
     }
     vTaskDelete(NULL);
