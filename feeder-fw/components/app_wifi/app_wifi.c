@@ -7,19 +7,6 @@
  *
  * @copyright Copyright (c) 2024 PetDog
  *
-    Copyright 2024 PetDog
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
  */
 
 #include <string.h>
@@ -39,26 +26,20 @@
 #include "app_web_server.h"
 #include "app_gpio.h"
 
-#define ESP_WIFI_AP_SSID "PetDog ComeInt"
-#define ESP_WIFI_AP_CHANNEL 1
-#define ESP_WIFI_AP_PWD "Senha12345"
-#define ESP_WIFI_MAX_CONN_TO_AP 1
+#define ESP_WIFI_AP_SSID "PetDog ComeInt" ///< Wi-Fi AP SSID
+#define ESP_WIFI_AP_CHANNEL 1             ///< Wi-Fi AP channel
+#define ESP_WIFI_AP_PWD "Senha12345"      ///< Wi-Fi AP password
+#define ESP_WIFI_MAX_CONN_TO_AP 1         ///< Maximum number of connections to the Wi-Fi AP
 
 static const char *TAG = "app_wifi"; ///< Tag to be used when logging
 
 static void wifi_event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
 
-/*! @var typedef enum wifi_status
-        {
-            WIFI_OFF,
-            WIFI_ON
-        } wifi_status_t;
-    @brief Typedef for indicating Wi-Fi status.
- */
+/// @brief Typedef for indicating Wi-Fi status.
 typedef enum wifi_status
 {
-    WIFI_OFF,
-    WIFI_ON
+    WIFI_OFF, /**< Wi-Fi off */
+    WIFI_ON   /**< Wi-Fi on */
 } wifi_status_t;
 
 static wifi_status_t wifi_status = WIFI_OFF;                 ///< Wi-Fi status
