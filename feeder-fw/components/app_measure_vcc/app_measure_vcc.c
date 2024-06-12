@@ -6,8 +6,6 @@
  * @date 2024-03-23
  *
  * @copyright Copyright (c) 2024 PetDog
- *
-    Copyright 2024 PetDog
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -42,7 +40,7 @@ static const char *TAG = "app_measure_vcc";  ///< Tag to be used when logging
 static adc_oneshot_unit_handle_t adc_handle; ///< ADC handle
 static adc_oneshot_unit_init_cfg_t init_config = {
     .unit_id = ADC_UNIT_1,
-};                                                                ///< ADC initialization configuration
+}; ///< ADC initialization configuration
 static adc_cali_handle_t adc_cal_handle = NULL;                   ///< ADC calibration handle
 uint8_t calibration_successful = 0;                               ///< Flag to indicate if calibration was successful
 int voltage_measurements[VOLTAGE_MEAS_AVG_ARR_SIZE] = {0};        ///< Array to store voltage measurements to calculate average

@@ -6,8 +6,6 @@
  * @date 2024-03-24
  *
  * @copyright Copyright (c) 2024 PetDog
- *
-    Copyright 2024 PetDog
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -94,7 +92,7 @@ static beacon_t beacon = {
     .auth_mac = {0},
     .found = 0,
     .times_seen = 0,
-};                                                                        ///< Variable that holds beacon informatio
+}; ///< Variable that holds beacon informatio
 static int rssi_moving_avg_samples[RSSI_MOVING_AVG_NUM_OF_SAMPLES] = {0}; ///< Array with RSSI moving average samples
 static uint8_t rssi_moving_avg_samples_index = 0;                         /** Index of RSSI moving average to keep track of
                                                                            * which position the samples are supposed to be stored in */
