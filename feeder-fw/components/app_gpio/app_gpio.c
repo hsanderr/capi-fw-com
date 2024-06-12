@@ -1,13 +1,11 @@
 /**
- * @file app_web_server.c
+ * @file app_gpio.c
  * @author Henrique Sander Lourenço (henriquesander27@gmail.com)
  * @brief Contains GPIO-related code (buttons and LEDs).
  * @version 0.1
  * @date 2024-03-20
  *
  * @copyright Copyright (c) 2024 PetDog
- *
-    Copyright 2024 PetDog
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +20,7 @@
     limitations under the License.
  */
 
-#define LOG_LOCAL_LEVEL ESP_LOG_NONE
+#define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_intr_alloc.h"

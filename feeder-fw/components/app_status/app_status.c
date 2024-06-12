@@ -6,8 +6,6 @@
  * @date 2024-03-23
  *
  * @copyright Copyright (c) 2024 PetDog
- *
-    Copyright 2024 PetDog
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -104,7 +102,7 @@ static void app_status__check_status_task(void *arg)
         {
             ESP_LOGI(TAG, "All batteries ok!");
         }
-        vTaskDelay(10000 / portTICK_PERIOD_MS);
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
     vTaskDelete(NULL);
 }

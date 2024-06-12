@@ -6,8 +6,6 @@
  * @date 2024-03-23
  *
  * @copyright Copyright (c) 2024 PetDog
- *
-    Copyright 2024 PetDog
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +20,7 @@
     limitations under the License.
  */
 
-#define LOG_LOCAL_LEVEL ESP_LOG_NONE
+#define LOG_LOCAL_LEVEL ESP_LOG_INFO
 #include "esp_log.h"
 #include "esp_err.h"
 #include "esp_adc/adc_oneshot.h"
@@ -42,7 +40,7 @@ static const char *TAG = "app_measure_vcc";  ///< Tag to be used when logging
 static adc_oneshot_unit_handle_t adc_handle; ///< ADC handle
 static adc_oneshot_unit_init_cfg_t init_config = {
     .unit_id = ADC_UNIT_1,
-};                                                                ///< ADC initialization configuration
+}; ///< ADC initialization configuration
 static adc_cali_handle_t adc_cal_handle = NULL;                   ///< ADC calibration handle
 uint8_t calibration_successful = 0;                               ///< Flag to indicate if calibration was successful
 int voltage_measurements[VOLTAGE_MEAS_AVG_ARR_SIZE] = {0};        ///< Array to store voltage measurements to calculate average
@@ -69,7 +67,7 @@ esp_err_t app_measure_vcc__init(void)
         return ESP_FAIL;
     }
     ESP_LOGI(TAG, "Success creating new ADC unit!");
-    err = adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_0, &adc_config);
+    err = adc_oneshot_config_channel(adc_handle, ADC_CHANNEL_0, &adc_config); // GPIO 36 (VP in DevKitC V4)
     if (err != ESP_OK)
     {
         ESP_LOGE(TAG, "Error %d configuring ADC channel: %s", err, esp_err_to_name(err));
